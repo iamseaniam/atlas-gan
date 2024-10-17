@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 # Set up deep learning framework:
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import Sequrntial
-from tensorflow.keras.layers import Dense,Flatten
+import time
+import numpy as np
+from tensorflow.keras import layers
 import matplotlib as plt
 
 
 # Loading in the mnist dataset
-(x_train, y_train), (x_Test, y_test) = keras.datasets.mnist.load_data()
+(train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
 
-# Preprocessing data, values down to a range of 0 and 1
-x_train, x_test = x_train / 255.0, x_test / 255.0
+train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
+# Normalize the images to [-1, 1]
+train_images = (train_images - 127.5) / 127.5
+
+BUFFER_SIZE = 60000
+BATCH_SIZE = 256
+
+# Batch and shuffle the data
+train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
