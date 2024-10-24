@@ -8,7 +8,7 @@ import os
 import matplotlib.pyplot as plt
 
 
-def train_gan(generator, discriminator, gan, data, epochs, batch_size, latent_dim, log_dir)
+def train_gan(generator, discriminator, gan, data, epochs, batch_size, latent_dim, log_dir):
     half_batch = batch_size // 2
     losses = []
 
