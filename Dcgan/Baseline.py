@@ -183,7 +183,7 @@ display_image(EPOCHS)
 
 anim_file = 'dcgan.gif'
 
-with imageio.get_writer(anim_file, mode='I') as writer
+with imageio.get_writer(anim_file, mode='I') as writer:
     filenames = glob.glob('image*.png')
     filenames = sorted(filenames)
     for filename in filenames:
