@@ -102,3 +102,11 @@ checkpoint = tf.train.Checkpoint(generator_optimizer=generator_optimizer,
                                  discriminator_optimizer=discriminator_optimizer,
                                  generator=generator,
                                  discriminator=discriminator)
+
+EPOCHS = 50
+noise_dim = 100
+num_examples_to_generate = 16
+
+# HL: you will reuse this seed overtime (so its easier)
+# HL: to visualize progress in the animated GIF)
+seed = tf.random.normal([num_examples_to_generate, noise_dim])
