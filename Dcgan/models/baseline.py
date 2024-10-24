@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Dcgan/models/baseline.py
+# hl: Dcgan/models/baseline.py
     """ Contains
     Generator, 
     Discriminator,

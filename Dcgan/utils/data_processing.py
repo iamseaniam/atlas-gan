@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Dcgan/utils/data_processing
+# hl: Dcgan/utils/data_processing
 """ Preparing the MNIST dataset """
 import numpy as np
 from tensorflow.keras.datasets import mnist
