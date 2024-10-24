@@ -1,1 +1,0 @@
-# Dcgan README
