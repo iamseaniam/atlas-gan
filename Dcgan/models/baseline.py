@@ -20,7 +20,7 @@ def build_generator(latent_dim):
 
 def build_discriminator(img_shape):
     model = tf.keras.Sequential([
-        layers.Conv2D(64, kernel_size=3, strides=2, padding='same', input_shape=imgshape),
+        layers.Conv2D(64, kernel_size=3, strides=2, padding='same', input_shape=img_shape),
         layers.LeakyReLU(0.2),
         layers.Conv2D(128, kernel_size=3, strides=2, padding='same'),
         layers.LeakyReLU(0.2),
