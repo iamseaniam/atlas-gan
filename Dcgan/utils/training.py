@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # hl: Dcgan/utils/training.py
-    """ functions for training the GAN and saving results """
+""" functions for training the GAN and saving results """
 import tensorflow as tf
 from keras.models import Model
 import numpy as np
