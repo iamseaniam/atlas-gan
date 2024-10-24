@@ -25,7 +25,9 @@ train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_
 
 def make_generator_model():
     model = tf.keras.Sequential()
-    
+
+    model.add(tf.keras.Input(shape=(100,)))
+
     model.add(layers.Dense(7*7*256, use_bias=False))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
