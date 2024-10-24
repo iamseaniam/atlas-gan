@@ -42,3 +42,23 @@ def train_gan(generator, discriminator, gan, data, epochs, batch_size, latent_di
         generator.save(f'log/model_at_epoch_{epoch}.h5')
 
     return losses
+
+def save_images(generator, epoch, log_dir, latent_dim=100, num_images=25):
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # hl: Generate noise and create fake images
+    noise = np.random.randn(num_images, latent_dim)
+    generated_images = generator.predict(noise)
+    
+    # hl: Create a grid for 5x5 images (25 images total)
+    fig, axes = plt.subplots(5, 5, figsize=(5, 5))
+    for i, ax in enumerate(axes.flat):
+        # hl: Reshape and scale back to the original MNIST scale [0, 1] from [-1, 1]
+        img = 0.5 * generated_images[i] + 0.5
+        ax.imshow(img[:, :, 0], cmap='gray')
+        ax.axis('off')  # Turn off axes for a cleaner image
+
+    # hl: Save the grid of images
+    image_path = os.path.join(log_dir, f"generated_images_epoch_{epoch}.png")
+    plt.savefig(image_path)
+    plt.close()
