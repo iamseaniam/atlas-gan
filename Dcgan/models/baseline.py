@@ -29,3 +29,15 @@ def build_discriminator(img_shape):
     ])
     return model
 
+def build_dcgan(generator, discriminator):
+    discriminator.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    discriminator.trainable = False
+
+    gan_input = layers.Input(shape=(100,))
+    generated_image = generator(gan_input)
+    gan_output = discriminator(generated_image)
+
+    gan = tf.keras.models.Model(gan_input, gan_output)
+    gan.compile(loss='binary_crossentropy', optimizer='adam')
+
+return gan
