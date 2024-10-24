@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # hl: Dcgan/models/baseline.py
-    """ Contains
-    Generator, 
-    Discriminator,
-    DCGAN
-    """
+""" Contains
+Generator, 
+Discriminator,
+DCGAN
+"""
 import tensorflow as tf
 from tensorflow.keras import layers
 
@@ -40,4 +40,4 @@ def build_dcgan(generator, discriminator):
     gan = tf.keras.models.Model(gan_input, gan_output)
     gan.compile(loss='binary_crossentropy', optimizer='adam')
 
-return gan
+    return gan

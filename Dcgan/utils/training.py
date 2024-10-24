@@ -17,7 +17,7 @@ def train_gan(generator, discriminator, gan, data, epochs, batch_size, latent_di
         real_images = data[np.random.randint(0, data.shape[0], half_batch)]
         fake_images = generator.predict(np.random.randn(half_batch, latent_dim))
         real_labels = np.ones((half_batch, 1))
-        fake_labels = np.zeros((hatch_batch, 1))
+        fake_labels = np.zeros((half_batch, 1))
 
         d_loss_real = discriminator.train_on_batch(real_images, real_labels)
         d_loss_fake = discriminator.train_on_batch(fake_images, fake_labels)
@@ -36,7 +36,7 @@ def train_gan(generator, discriminator, gan, data, epochs, batch_size, latent_di
         save_images(generator, epoch, log_dir)
 
     if epoch % 10 == 0:
-        save_generated_images(epoch, generator)
+        save_images(epoch, generator)
 
     if epoch % 20 == 0:
         generator.save(f'log/model_at_epoch_{epoch}.h5')
