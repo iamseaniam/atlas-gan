@@ -1,0 +1,15 @@
+First training:
+    epochs: 50
+    stride: 
+        first layer: 2
+        second layer: 2
+    Time: forgot to record
+    Personal notes:
+        Final prouduct looked decent but some of the numbers were still pretty fuzzy and not clear what they were.
+
+Second training:
+    epochs: 50
+    stride:
+        first layer: 1
+        second layer: 2
+    time: 21 min
