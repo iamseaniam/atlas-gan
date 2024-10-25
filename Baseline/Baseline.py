@@ -8,6 +8,7 @@ import os
 import PIL
 from tensorflow.keras import layers
 import time
+import csv
 
 from IPython import display
 
@@ -104,6 +105,12 @@ num_examples_to_generate = 16
 # HL: to visualize progress in the animated GIF)
 seed = tf.random.normal([num_examples_to_generate, noise_dim])
 
+# Create a CSV to store the epoch, generator loss, discriminator loss, and time per epoch
+csv_file = "dcgan_stats.csv"
+with open(csv_file, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["Epoch", "Generator Loss", "Discriminator Loss", "Epoch Time (s)"])
+
 # Notice the use of `tf.function`
 # This annotation causes the function to be "compiled".
 @tf.function
@@ -125,12 +132,31 @@ def train_step(images):
     generator_optimizer.apply_gradients(zip(gradients_of_generator, generator.trainable_variables))
     discriminator_optimizer.apply_gradients(zip(gradients_of_discriminator, discriminator.trainable_variables))
 
+    return gen_loss, disc_loss
+
 def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
 
+        epoch_gen_loss = 0
+        epoch_disc_loss = 0
+        num_batches = 0
+
         for image_batch in dataset:
-            train_step(image_batch)
+            gen_loss, disc_loss = train_step(image_batch)
+            epoch_gen_loss += gen_loss
+            epoch_disc_loss += disc_loss
+            num_batches += 1
+
+        # Average the losses
+        epoch_gen_loss /= num_batches
+        epoch_disc_loss /= num_batches
+
+        # Save stats to CSV
+        epoch_time = time.time() - start
+        with open(csv_file, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([epoch + 1, float(epoch_gen_loss), float(epoch_disc_loss), epoch_time])
 
         # Produce images for the GIF as you go
         display.clear_output(wait=True)
@@ -140,13 +166,13 @@ def train(dataset, epochs):
         if (epoch + 1) % 15 == 0:
             checkpoint.save(file_prefix = checkpoint_prefix)
 
-        print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+        print(f'Epoch {epoch + 1}, Gen Loss: {epoch_gen_loss}, Disc Loss: {epoch_disc_loss}, Time: {epoch_time:.2f}s')
 
     # Generate after the final epoch
     display.clear_output(wait=True)
-    generate_and_save_images(generator,
-                           epochs,
-                           seed)
+    generate_and_save_images(generator, epochs, seed)
+
+train(train_dataset, EPOCHS)
 
 def generate_and_save_images(model, epoch, test_input):
     # Notice `training` is set to False.
