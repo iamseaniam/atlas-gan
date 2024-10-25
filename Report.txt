@@ -1,0 +1,13 @@
+- dcgan/ - Root folder for the DCGAN project
+
+    # Image quilty was like 70/100, average time took around 47 seconds.
+    -  Baseline/ - Contains the first model architect
+        - Images/ - Contains images of the model progress
+        - Training/ - check points for baseline model
+        - Baseline.cvs / - Stats for baseline model
+
+    # Image quality was 74/100, average time around 61 seconds
+    -  First_Experiment/ - Contains the first experiment
+        - Images/ - Contains images of the model progress
+        - Training/ - check points for baseline model
+        - Experiment1.cvs / - Stats for experiment1 model
