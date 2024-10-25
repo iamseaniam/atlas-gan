@@ -2,7 +2,7 @@
 """"""
 import tensorflow as tf
 import glob
-import imageio
+import imageio.v2 as imageio
 import matplotlib.pyplot as plt
 import os
 import PIL
@@ -15,27 +15,23 @@ from IPython import display
 (train_images, train_labels), (_, _) = tf.keras.datasets.mnist.load_data()
 
 train_images = train_images.reshape(train_images.shape[0], 28, 28, 1).astype('float32')
-train_images = (train_images - 127.5) / 127.5 # HL Normalize the images to [-1, 1]
+train_images = (train_images - 127.5) / 127.5  # Normalize the images to [-1, 1]
 
 BUFFER_SIZE = 60000
 BATCH_SIZE = 256
 
-# HL: batch and shuffle the data
+# Batch and shuffle the data
 train_dataset = tf.data.Dataset.from_tensor_slices(train_images).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 
 def make_generator_model():
     model = tf.keras.Sequential()
-
-    model.add(tf.keras.Input(shape=(100,)))
-
-    model.add(layers.Dense(7*7*256, use_bias=False))
+    model.add(layers.Dense(7*7*256, use_bias=False, input_shape=(100,)))
     model.add(layers.BatchNormalization())
     model.add(layers.LeakyReLU())
 
     model.add(layers.Reshape((7, 7, 256)))
-    assert model.output_shape == (None, 7, 7, 256) # HL: Note: None is the batch size
+    assert model.output_shape == (None, 7, 7, 256)  # Note: None is the batch size
 
-    # todo: try kernel_initializer='glorot_normal'))
     model.add(layers.Conv2DTranspose(128, (5, 5), strides=(1, 1), padding='same', use_bias=False))
     assert model.output_shape == (None, 7, 7, 128)
     model.add(layers.BatchNormalization())
@@ -47,24 +43,21 @@ def make_generator_model():
     model.add(layers.LeakyReLU())
 
     model.add(layers.Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh'))
-    # ? why use tanh.
     assert model.output_shape == (None, 28, 28, 1)
 
     return model
 
 generator = make_generator_model()
+
 noise = tf.random.normal([1, 100])
 generated_image = generator(noise, training=False)
 
 plt.imshow(generated_image[0, :, :, 0], cmap='gray')
-plt.show()
 
 def make_discriminator_model():
     model = tf.keras.Sequential()
-
-    model.add(tf.keras.Input(shape=[28, 28, 1]))
-    model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same'))
-
+    model.add(layers.Conv2D(64, (5, 5), strides=(2, 2), padding='same',
+                                     input_shape=[28, 28, 1]))
     model.add(layers.LeakyReLU())
     model.add(layers.Dropout(0.3))
 
@@ -111,7 +104,8 @@ num_examples_to_generate = 16
 # HL: to visualize progress in the animated GIF)
 seed = tf.random.normal([num_examples_to_generate, noise_dim])
 
-# ! tf.function cuases function to be "compiled"
+# Notice the use of `tf.function`
+# This annotation causes the function to be "compiled".
 @tf.function
 def train_step(images):
     noise = tf.random.normal([BATCH_SIZE, noise_dim])
@@ -134,31 +128,29 @@ def train_step(images):
 def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
-    
-    for image_batch in dataset:
-        train_step(image_batch)
 
-    # HL: Produces images for the GIF as you go
+        for image_batch in dataset:
+            train_step(image_batch)
+
+        # Produce images for the GIF as you go
+        display.clear_output(wait=True)
+        generate_and_save_images(generator, epoch + 1, seed)
+
+        # Save the model every 15 epochs
+        if (epoch + 1) % 15 == 0:
+            checkpoint.save(file_prefix = checkpoint_prefix)
+
+        print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
+
+    # Generate after the final epoch
     display.clear_output(wait=True)
     generate_and_save_images(generator,
-                             epoch + 1,
-                             seed)
-
-    # HL: Save the model every 15 epochs
-    if (epoch + 1) % 15 == 0:
-        checkpoint.save(file_prefix = checkpoint_prefix)
-    
-    print ('Time for epoch {} is {} sec'.format(epoch + 1, time.time()-start))
-
-    # HL: Generate after the final epoch
-    display.clear_output(wait=True)
-    generate_and_save_images(generator,
-                             epochs,
-                             seed)
+                           epochs,
+                           seed)
 
 def generate_and_save_images(model, epoch, test_input):
-    # HL: Notice 'training' is set to False.
-    # HL: This is so all layers run in inference mode (batchnorm)
+    # Notice `training` is set to False.
+    # This is so all layers run in inference mode (batchnorm).
     predictions = model(test_input, training=False)
 
     fig = plt.figure(figsize=(4, 4))
@@ -169,7 +161,8 @@ def generate_and_save_images(model, epoch, test_input):
         plt.axis('off')
 
     plt.savefig('image_at_epoch_{:04d}.png'.format(epoch))
-    plt.show()
+    #! plt.show() removed, no need to close plots either
+
 
 train(train_dataset, EPOCHS)
 
@@ -194,3 +187,5 @@ with imageio.get_writer(anim_file, mode='I') as writer:
 
 import tensorflow_docs.vis.embed as embed
 embed.embed_file(anim_file)
+
+generator.summary()
